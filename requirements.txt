@@ -1,0 +1,9 @@
+flask>=2.3.0
+flask-cors==4.0.0
+langchain==0.3.25
+langchain-huggingface
+sentence-transformers
+transformers
+torch
+pymongo
+python-dotenv

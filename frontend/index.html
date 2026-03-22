@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supreme Court Legal Dashboard</title>
+  <style>
+    /* ... (Your existing CSS for index.html) ... */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0f;
+      min-height: 100vh;
+      color: #ffffff;
+      position: relative;
+      overflow-x: hidden;
+      display: flex; /* Added flexbox for layout */
+      flex-direction: column; /* Stack children vertically */
+    }
+
+    /* Animated moving background */
+    .background-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background: linear-gradient(45deg, #0a0a0f 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    .floating-shapes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .shape {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 50%;
+      animation: float 20s infinite linear;
+    }
+
+    .shape:nth-child(1) { width: 80px; height: 80px; left: 10%; animation-delay: 0s; animation-duration: 20s; }
+    .shape:nth-child(2) { width: 120px; height: 120px; left: 20%; animation-delay: 2s; animation-duration: 25s; }
+    .shape:nth-child(3) { width: 60px; height: 60px; left: 70%; animation-delay: 4s; animation-duration: 18s; }
+    .shape:nth-child(4) { width: 100px; height: 100px; left: 80%; animation-delay: 6s; animation-duration: 22s; }
+    .shape:nth-child(5) { width: 90px; height: 90px; left: 50%; animation-delay: 8s; animation-duration: 24s; }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
+    }
+
+    @keyframes float {
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+
+    /* Navigation Bar Styles (Consistent with login/signup for shared CSS) */
+    .dashboard-header {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      animation: slideDown 0.8s ease-out;
+      width: 100%;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #64b5f6 0%, #1976d2 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(66, 165, 245, 0.3);
+    }
+
+    .brand-info h1 {
+      font-size: 1.8rem;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .brand-info p {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .nav-section {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+    }
+
+    .nav-link {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.05rem;
+      padding: 0.5rem 0;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: linear-gradient(90deg, #64b5f6, #42a5f5);
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: #ffffff;
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    .nav-link.active {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .nav-link.active::after {
+      width: 100%;
+      background: #64b5f6; /* Solid color for active */
+    }
+
+    .user-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #64b5f6, #1976d2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      font-size: 0.9rem;
+    }
+
+    .user-details span {
+      display: block;
+      font-size: 0.9rem;
+    }
+
+    .user-details .user-name {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .user-details .user-role {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.8rem;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: rgba(30, 30, 40, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      min-width: 180px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+      padding: 0.5rem 0;
+      list-style: none;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 1001;
+    }
+
+    .user-info.active .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-menu li a {
+      display: block;
+      padding: 0.8rem 1.2rem;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .dropdown-menu li a:hover {
+      background: rgba(100, 181, 246, 0.2);
+      color: #64b5f6;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 15px rgba(66, 165, 245, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(66, 165, 245, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: #64b5f6;
+      transform: translateY(-2px);
+    }
+
+    /* Message Display (Global - copied from auth pages for consistency) */
+    .message-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none; /* Allows clicks to pass through */
+    }
+
+    .message {
+      background-color: #333;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+      min-width: 250px;
+      max-width: 350px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: auto; /* Re-enable pointer events for the message itself */
+    }
+
+    .message.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .message.success {
+      background-color: #4CAF50;
+    }
+
+    .message.error {
+      background-color: #f44336;
+    }
+
+    .message.warning {
+      background-color: #ff9800;
+    }
+
+
+    /* Main content styles */
+    .dashboard-container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 2rem auto;
+      padding: 0 2rem;
+      flex-grow: 1; /* Allow content to take up available space */
+    }
+
+    .dashboard-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, #ffffff 0%, #64b5f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+    }
+
+    .search-section {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .search-input-group {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .search-input {
+      flex-grow: 1;
+      padding: 1rem 1.2rem;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      color: #ffffff;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .search-input:focus {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(100, 181, 246, 0.6);
+      box-shadow: 0 0 0 4px rgba(100, 181, 246, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .search-button {
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 15px rgba(66, 165, 245, 0.3);
+    }
+
+    .search-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(66, 165, 245, 0.4);
+    }
+
+    .upload-section {
+      text-align: center;
+      position: relative;
+    }
+
+    .upload-label {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px dashed rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      padding: 1.5rem 2rem;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.7);
+      transition: all 0.3s ease;
+    }
+
+    .upload-label:hover {
+      border-color: #64b5f6;
+      color: #64b5f6;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .upload-input {
+      display: none;
+    }
+
+    .results-section {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      min-height: 200px;
+    }
+
+    .result-item {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .result-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .result-item h3 {
+      font-size: 1.5rem;
+      color: #64b5f6;
+      margin-bottom: 0.8rem;
+    }
+
+    .result-item p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .summary {
+      cursor: pointer;
+      text-decoration: underline;
+      color: #64b5f6;
+      font-style: italic;
+    }
+
+    .loading-animation {
+      text-align: center;
+      padding: 2rem;
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid #64b5f6;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 1rem auto;
+    }
+
+    .error {
+      color: #f44336;
+      text-align: center;
+      padding: 1rem;
+      font-size: 1.1rem;
+    }
+
+    /* Footer Styles */
+    .footer {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1.5rem 0;
+      text-align: center;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: auto; /* Push footer to the bottom */
+    }
+
+    .footer p {
+      margin: 0;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .dashboard-title {
+        font-size: 2rem;
+      }
+
+      .search-section {
+        padding: 1.5rem;
+      }
+
+      .search-input-group {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+
+      .search-input, .search-button {
+        width: 100%;
+      }
+
+      .results-section {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background-animation"></div>
+  <div class="floating-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+  </div>
+
+  <div id="navbar-placeholder"></div>
+   <script>
+  fetch("nav.html")
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById("navbar-placeholder").innerHTML = html;
+
+      // ⏬ Re-run script blocks inside nav.html
+      const scripts = document
+        .querySelector("#navbar-placeholder")
+        .querySelectorAll("script");
+
+      scripts.forEach(oldScript => {
+        const newScript = document.createElement("script");
+        if (oldScript.type) newScript.type = oldScript.type;
+        if (oldScript.src) newScript.src = oldScript.src;
+        else newScript.textContent = oldScript.textContent;
+        document.body.appendChild(newScript);
+        oldScript.remove();
+      });
+    });
+</script>
+
+
+  <main class="dashboard-container">
+    <h1 class="dashboard-title">Dashboard</h1>
+
+    <section class="search-section">
+      <h2>Document Search & Analysis</h2>
+      <div class="search-input-group">
+        <input type="text" id="queryInput" class="search-input" placeholder="Enter your query or keywords...">
+        <button id="searchButton" class="search-button">Search Documents</button>
+      </div>
+      <div class="upload-section">
+        <label for="fileInput" class="upload-label">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-upload-cloud" style="vertical-align: middle; margin-right: 8px;"><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path><polyline points="16 16 12 12 8 16"></polyline></svg>
+          Or Drag & Drop / Click to Upload Document (PDF, DOCX)
+        </label>
+        <input type="file" id="fileInput" class="upload-input" accept=".pdf,.doc,.docx">
+      </div>
+    </section>
+
+    <section class="results-section">
+      <h2>Search Results</h2>
+      <div id="results">
+        <div class="loading-animation" style="display: none;">
+          <div class="spinner"></div>
+          <p>Analyzing document and fetching results...</p>
+        </div>
+        <div class="initial-message">
+          <p>Your search results and document analysis will appear here.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2024 LegalDocAnalyser. All rights reserved.</p>
+  </footer>
+
+
+
+
+  <script type="module">
+    // Import auth-setup.js to ensure authentication state is managed
+    import { auth, updateNavigation, isLoggedIn, currentUser } from './auth-setup.js';
+
+    // Function to load navbar.html
+    async function loadNavbar() {
+      try {
+        const response = await fetch('nav.html');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const navHtml = await response.text();
+        document.getElementById('navbar-placeholder').innerHTML = navHtml;
+
+        // After navbar is loaded, update its state based on current auth state
+        updateNavigation(); // Call the exported function from auth-setup.js
+        
+        // Also, set active nav link for the current page
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-link').forEach(link => {
+          if (currentPath.includes(link.getAttribute('href'))) {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+
+      } catch (error) {
+        console.error('Error loading navbar:', error);
+        document.getElementById('navbar-placeholder').innerHTML = '<p style="color: white;">Failed to load navigation bar.</p>';
+      }
+    }
+
+    // Call loadNavbar() immediately when the page script runs
+    loadNavbar();
+
+
+    // Rest of your index.html specific JavaScript
+    // ... (Your existing index.html JS for search, upload, etc.) ...
+    const searchButton = document.getElementById("searchButton");
+    const fileInput = document.getElementById("fileInput");
+    const queryInput = document.getElementById("queryInput");
+    const resultsDiv = document.getElementById("results");
+    const loadingAnimation = resultsDiv.querySelector(".loading-animation");
+    const initialMessage = resultsDiv.querySelector(".initial-message");
+
+    function showLoading() {
+      if (initialMessage) initialMessage.style.display = 'none';
+      if (loadingAnimation) loadingAnimation.style.display = 'block';
+      resultsDiv.innerHTML = ''; // Clear previous results
+      resultsDiv.appendChild(loadingAnimation); // Re-append it to maintain structure
+      if (initialMessage) resultsDiv.appendChild(initialMessage); // Re-append initial message if exists
+    }
+
+    function hideLoading() {
+      if (loadingAnimation) loadingAnimation.style.display = 'none';
+    }
+
+    function truncate(text, maxLength = 200) {
+      if (text.length <= maxLength) return text;
+      return text.substring(0, maxLength) + '... <em>(click to expand)</em>';
+    }
+
+    function unescapeHtml(html) {
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      return div.textContent;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Ensure initial message is visible on load
+      if (initialMessage) {
+        initialMessage.style.display = 'block';
+      }
+      if (loadingAnimation) {
+        loadingAnimation.style.display = 'none'; // Hide spinner initially
+      }
+    });
+
+    searchButton.addEventListener("click", handleSearch);
+    fileInput.addEventListener("change", handleFileChange);
+
+    function handleFileChange() {
+      if (fileInput.files.length > 0) {
+        queryInput.value = ""; // Clear text input if file is selected
+      }
+    }
+
+    resultsDiv.addEventListener('click', function(e) {
+      if (e.target.classList.contains('summary')) {
+        const isTruncated = e.target.innerHTML.includes('(click to expand)');
+        const full = e.target.dataset.full;
+        e.target.innerHTML = isTruncated
+          ? unescapeHtml(full) + ' <em>(click to collapse)</em>'
+          : truncate(unescapeHtml(full));
+      }
+    });
+
+    function handleSearch() {
+      const file = document.getElementById("fileInput").files[0];
+      const query = document.getElementById("queryInput").value.trim();
+
+      if (file) {
+        readFileAndSearch(file);
+      } else if (query) {
+        runSearch(query);
+      } else {
+        document.getElementById('results').innerHTML =
+          '<div class="error">⚠️ Please enter text or upload a document to search.</div>';
+      }
+    }
+
+    function readFileAndSearch(file) {
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const fileText = e.target.result;
+        runSearch(fileText);
+      };
+
+      reader.onerror = function () {
+        document.getElementById('results').innerHTML =
+          '<div class="error">❌ Failed to read the file. Please try again.</div>';
+      };
+
+      if (file.type === "application/pdf") {
+        document.getElementById('results').innerHTML =
+          '<div class="error">PDF parsing is not yet implemented. Please upload a DOCX or enter text.</div>';
+        hideLoading();
+        return;
+      }
+      
+      // For DOCX, you'd typically need a library or backend service to parse it.
+      // For demonstration, we'll just show a message.
+      if (file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+        document.getElementById('results').innerHTML =
+          '<div class="error">DOCX parsing is not yet implemented. Please enter text.</div>';
+        hideLoading();
+        return;
+      }
+
+      reader.readAsText(file); // For text-based files like .txt
+    }
+
+    async function runSearch(searchText) {
+      showLoading();
+      resultsDiv.innerHTML = ''; // Clear existing results
+
+      try {
+        // Simulate an API call
+        const response = await new Promise(resolve => setTimeout(() => {
+          const mockResults = [
+            {
+              title: "Landmark Case: Kesavananda Bharati v. State of Kerala",
+              summary: "This case laid down the 'Basic Structure Doctrine' of the Indian Constitution, stating that certain fundamental features of the Constitution cannot be amended by the Parliament. This doctrine has been a cornerstone of Indian constitutional law, limiting the Parliament's power to amend the Constitution and upholding its democratic and secular character. It established judicial review as a key feature for protecting the spirit of the Constitution.",
+              link: "#"
+            },
+            {
+              title: "Right to Privacy: K.S. Puttaswamy v. Union of India",
+              summary: "The Supreme Court of India unanimously affirmed that the right to privacy is a fundamental right under the Indian Constitution. This judgment had significant implications for data protection, surveillance, and personal liberties in the digital age. It recognized privacy as an intrinsic part of life and personal liberty under Article 21.",
+              link: "#"
+            },
+            {
+              title: "Aadhar Verdict: Challenging the Constitutionality of Aadhar Act",
+              summary: "The Supreme Court upheld the constitutional validity of the Aadhar Act, but with certain caveats. It struck down some provisions that allowed private entities to use Aadhar data. The judgment emphasized that Aadhar is meant for welfare schemes and not for general surveillance. It balanced the state's interest in welfare distribution with individual privacy rights.",
+              link: "#"
+            }
+          ];
+          resolve({ status: 200, json: () => Promise.resolve({ results: mockResults }) });
+        }, 1500)); // Simulate network delay
+
+        const data = await response.json();
+
+        if (data.results && data.results.length > 0) {
+          data.results.forEach(item => {
+            const resultItem = document.createElement('div');
+            resultItem.className = 'result-item';
+            const fullSummary = item.summary;
+            const displayedSummary = truncate(fullSummary, 150); // Adjust length as needed
+
+            resultItem.innerHTML = `
+              <h3>${item.title}</h3>
+              <p class="summary" data-full="${escapeHtml(fullSummary)}">${displayedSummary}</p>
+              ${item.link ? `<p><a href="${item.link}" target="_blank" style="color: #64b5f6; text-decoration: none;">Read More</a></p>` : ''}
+            `;
+            resultsDiv.appendChild(resultItem);
+          });
+        } else {
+          resultsDiv.innerHTML = '<div class="initial-message"><p>No results found for your query.</p></div>';
+        }
+      } catch (error) {
+        console.error('Search failed:', error);
+        resultsDiv.innerHTML = '<div class="error">❌ An error occurred during search. Please try again.</div>';
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supreme Court Legal Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0f;
+      min-height: 100vh;
+      color: #ffffff;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated moving background */
+    .background-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background: linear-gradient(45deg, #0a0a0f 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    .floating-shapes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .shape {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 50%;
+      animation: float 20s infinite linear;
+    }
+
+    .shape:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      left: 10%;
+      animation-delay: 0s;
+      animation-duration: 20s;
+    }
+
+    .shape:nth-child(2) {
+      width: 120px;
+      height: 120px;
+      left: 20%;
+      animation-delay: 2s;
+      animation-duration: 25s;
+    }
+
+    .shape:nth-child(3) {
+      width: 60px;
+      height: 60px;
+      left: 70%;
+      animation-delay: 4s;
+      animation-duration: 18s;
+    }
+
+    .shape:nth-child(4) {
+      width: 100px;
+      height: 100px;
+      left: 80%;
+      animation-delay: 6s;
+      animation-duration: 22s;
+    }
+
+    .shape:nth-child(5) {
+      width: 90px;
+      height: 90px;
+      left: 50%;
+      animation-delay: 8s;
+      animation-duration: 24s;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Navigation Bar Styles */
+    .dashboard-header {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      animation: slideDown 0.8s ease-out;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 2rem;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #64b5f6 0%, #1976d2 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(66, 165, 245, 0.3);
+    }
+
+    .brand-info h1 {
+      font-size: 1.8rem;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .brand-info p {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .nav-section {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+    }
+
+    .nav-link {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.05rem;
+      padding: 0.5rem 0;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: linear-gradient(90deg, #64b5f6, #42a5f5);
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: #ffffff;
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    .nav-link.active {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .nav-link.active::after {
+      width: 100%;
+      background: #64b5f6; /* Solid color for active */
+    }
+
+    .user-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #64b5f6, #1976d2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      font-size: 0.9rem;
+    }
+
+    .user-details span {
+      display: block;
+      font-size: 0.9rem;
+    }
+
+    .user-details .user-name {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .user-details .user-role {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.8rem;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: rgba(30, 30, 40, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      min-width: 180px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+      padding: 0.5rem 0;
+      list-style: none;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 1001;
+    }
+
+    .user-info.active .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-menu li a {
+      display: block;
+      padding: 0.8rem 1.2rem;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .dropdown-menu li a:hover {
+      background: rgba(100, 181, 246, 0.2);
+      color: #64b5f6;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 15px rgba(66, 165, 245, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(66, 165, 245, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: #64b5f6;
+      transform: translateY(-2px);
+    }
+
+    /* Message Display */
+    .message-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message {
+      background-color: #333;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+      min-width: 250px;
+      max-width: 350px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .message.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .message.success {
+      background-color: #4CAF50;
+    }
+
+    .message.error {
+      background-color: #f44336;
+    }
+
+    .message.warning {
+      background-color: #ff9800;
+    }
+
+    /* Responsive nav */
+    @media (max-width: 768px) {
+      .header-content {
+        padding: 0 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .nav-section {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    /* Main Content */
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Analytics Specific Styles */
+    .hero-section {
+      text-align: center;
+      padding: 4rem 0;
+      margin-bottom: 4rem;
+      animation: slideUp 0.8s ease-out;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #ffffff 0%, #64b5f6 50%, #42a5f5 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: textGlow 2s ease-in-out infinite alternate;
+    }
+
+    .hero-subtitle {
+      font-size: 1.3rem;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+    }
+
+    .analytics-section {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 3rem;
+      margin-bottom: 4rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      animation: slideUp 0.8s ease-out 0.2s both;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ffffff 0%, #64b5f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1.5rem;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .filter-group {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .filter-group:focus-within {
+      box-shadow: 0 0 0 4px rgba(100, 181, 246, 0.1);
+      border-color: rgba(100, 181, 246, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .filter-label {
+      display: block;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 0.5rem;
+    }
+
+    .filter-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      font-size: 1rem;
+      color: #ffffff;
+      outline: none;
+    }
+
+    .filter-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .filter-button {
+      display: block;
+      width: 100%;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(66, 165, 245, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .filter-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(66, 165, 245, 0.4);
+    }
+
+    .chart-container {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .chart-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #64b5f6;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .results-area {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 2.5rem;
+      margin-top: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .results-summary {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+    }
+
+    .download-buttons {
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .download-btn {
+      padding: 0.8rem 1.5rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      background: rgba(76, 175, 80, 0.2);
+      color: #81c784;
+      border: 1px solid rgba(76, 175, 80, 0.3);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .download-btn:hover {
+      background: rgba(76, 175, 80, 0.3);
+      border-color: rgba(76, 175, 80, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .case-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .case-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, #64b5f6, #1976d2);
+      border-radius: 0 2px 2px 0;
+    }
+
+    .case-card:hover {
+      transform: translateY(-4px);
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .case-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #64b5f6;
+      margin-bottom: 0.5rem;
+    }
+
+    .case-card p {
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.6;
+    }
+
+    .case-meta {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 0.8rem;
+    }
+
+    .case-meta span {
+      margin-right: 1rem;
+    }
+
+    .summary {
+      cursor: pointer;
+      font-weight: 500;
+      text-decoration: underline;
+      transition: color 0.3s ease;
+    }
+
+    .summary:hover {
+      color: #42a5f5;
+    }
+
+    .error-message {
+      background: rgba(244, 67, 54, 0.1);
+      border: 1px solid rgba(244, 67, 54, 0.3);
+      color: #ef5350;
+      padding: 1.5rem 2rem;
+      border-radius: 16px;
+      text-align: center;
+      animation: shake 0.5s ease-in-out;
+      font-size: 1rem;
+      margin-top: 2rem;
+    }
+
+    .loading-indicator {
+      text-align: center;
+      padding: 3rem;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 1.2rem;
+    }
+
+    .loading-indicator::after {
+      content: '';
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top: 3px solid #64b5f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 1rem;
+    }
+
+    /* Animations */
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes textGlow {
+      0% { text-shadow: 0 0 20px rgba(100, 181, 246, 0.5); }
+      100% { text-shadow: 0 0 30px rgba(100, 181, 246, 0.8), 0 0 40px rgba(66, 165, 245, 0.3); }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+
+    @media (max-width: 768px) {
+      .filters-grid {
+        grid-template-columns: 1fr;
+      }
+      .results-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .download-buttons {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .download-btn {
+        flex-grow: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background-animation"></div>
+  <div class="floating-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+  </div>
+
+  <!-- Navigation Bar will be loaded here by JavaScript -->
+  <div id="navbar-placeholder"></div>
+   <script>
+  fetch("nav.html")
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById("navbar-placeholder").innerHTML = html;
+
+      // ⏬ Re-run script blocks inside nav.html
+      const scripts = document
+        .querySelector("#navbar-placeholder")
+        .querySelectorAll("script");
+
+      scripts.forEach(oldScript => {
+        const newScript = document.createElement("script");
+        if (oldScript.type) newScript.type = oldScript.type;
+        if (oldScript.src) newScript.src = oldScript.src;
+        else newScript.textContent = oldScript.textContent;
+        document.body.appendChild(newScript);
+        oldScript.remove();
+      });
+    });
+</script>
+
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <section class="hero-section">
+      <h1 class="hero-title">Legal Analytics Dashboard</h1>
+      <p class="hero-subtitle">
+        Explore trends and insights from Supreme Court cases with interactive charts and filters.
+      </p>
+    </section>
+
+    <section class="analytics-section">
+      <h2 class="section-title">Case Data Overview by Year</h2>
+      <div class="chart-container">
+        <canvas id="casesChart"></canvas>
+      </div>
+
+      <h2 class="section-title" style="margin-top: 3rem;">Filtered Case Search</h2>
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label for="yearFilter" class="filter-label">Year:</label>
+          <input type="number" id="yearFilter" class="filter-input" placeholder="e.g., 2023">
+        </div>
+        <div class="filter-group">
+          <label for="locationFilter" class="filter-label">Location:</label>
+          <input type="text" id="locationFilter" class="filter-input" placeholder="e.g., New Delhi">
+        </div>
+        <div class="filter-group">
+          <label for="caseTypeFilter" class="filter-label">Case Type:</label>
+          <input type="text" id="caseTypeFilter" class="filter-input" placeholder="e.g., Criminal">
+        </div>
+        <div class="filter-group">
+          <label for="startDateFilter" class="filter-label">Start Date:</label>
+          <input type="date" id="startDateFilter" class="filter-input">
+        </div>
+        <div class="filter-group">
+          <label for="endDateFilter" class="filter-label">End Date:</label>
+          <input type="date" id="endDateFilter" class="filter-input">
+        </div>
+        <button class="filter-button" onclick="runFilteredSearch()">Apply Filters</button>
+      </div>
+
+      <div class="results-area">
+        <div class="results-header">
+          <span class="results-summary" id="resultsSummary">0 cases found.</span>
+          <div class="download-buttons">
+            <button class="download-btn" onclick="downloadResults()">
+              ⬇️ Download JSON
+            </button>
+            <button class="download-btn" onclick="copyResultsToClipboard()">
+              📋 Copy to Clipboard
+            </button>
+          </div>
+        </div>
+        <div id="filteredResults">
+          <p style="text-align: center; color: rgba(255,255,255,0.6);">
+            Apply filters above to see specific case results.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+
+
+  <script type="module">
+    // Import auth state from auth-setup.js
+    import { isLoggedIn, showGlobalMessage } from './auth-setup.js';
+
+    // Check if user is logged in
+    if (!isLoggedIn) {
+      showGlobalMessage('Please log in to access this page.', 'error');
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 1000);
+      return;
+    }
+
+    // Function to load navbar.html
+    async function loadNavbar() {
+      try {
+        const response = await fetch('nav.html');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const navHtml = await response.text();
+        document.getElementById('navbar-placeholder').innerHTML = navHtml;
+
+        // Extract and execute all scripts from nav.html (including module scripts)
+        [...document.querySelector('#navbar-placeholder').querySelectorAll('script')].forEach(oldScript => {
+          const newScript = document.createElement('script');
+          // Retain type="module" and any src attributes
+          if (oldScript.type) newScript.type = oldScript.type;
+          if (oldScript.src) {
+            newScript.src = oldScript.src;
+          } else {
+            newScript.textContent = oldScript.textContent;
+          }
+          document.body.appendChild(newScript);
+          oldScript.remove(); // Remove the original script tag to avoid duplication
+        });
+
+      } catch (e) {
+        console.error("Could not load navigation bar:", e);
+        document.getElementById('navbar-placeholder').innerHTML = '<p style="color: red;">Failed to load navigation bar.</p>';
+      }
+    }
+
+    // Call loadNavbar() immediately to ensure it loads before DOMContentLoaded finishes
+    loadNavbar();
+
+    // Function to initialize and fetch chart data
+    async function initChart() {
+      try {
+        const res = await fetch('http://localhost:5000/chart-data');
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data = await res.json();
+        renderBarChart(data);
+      } catch (err) {
+        console.error('Error loading bar chart data:', err);
+        document.getElementById('casesChart').parentElement.innerHTML = '<div class="error-message">❌ Failed to load chart data. Please ensure the backend server is running.</div>';
+      }
+    }
+
+    function renderBarChart(chartData) {
+      const ctx = document.getElementById('casesChart').getContext('2d');
+      const years = chartData.map(d => d.year);
+      const counts = chartData.map(d => d.count);
+
+      if (myChart) {
+        myChart.destroy(); // Destroy existing chart if it exists
+      }
+
+      myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: years,
+          datasets: [{
+            label: 'Number of Cases',
+            data: counts,
+            backgroundColor: 'rgba(66, 165, 245, 0.7)', // Blue
+            borderColor: 'rgba(66, 165, 245, 1)',
+            borderWidth: 1,
+            borderRadius: 5,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: '#ffffff'
+              }
+            },
+            title: {
+                display: true,
+                text: 'Number of Supreme Court Cases by Year',
+                color: '#ffffff',
+                font: {
+                    size: 18
+                }
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Year',
+                color: '#ffffff'
+              },
+              ticks: {
+                color: '#ffffff',
+                maxRotation: 45,
+                minRotation: 45
+              },
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Count',
+                color: '#ffffff'
+              },
+              ticks: {
+                color: '#ffffff',
+                beginAtZero: true
+              },
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    async function runFilteredSearch() {
+      const year = document.getElementById('yearFilter').value;
+      const location = document.getElementById('locationFilter').value;
+      const caseType = document.getElementById('caseTypeFilter').value;
+      const startDate = document.getElementById('startDateFilter').value;
+      const endDate = document.getElementById('endDateFilter').value;
+      const filteredResultsDiv = document.getElementById('filteredResults');
+      const resultsSummarySpan = document.getElementById('resultsSummary');
+
+      filteredResultsDiv.innerHTML = '<div class="loading-indicator">Searching...</div>';
+      resultsSummarySpan.textContent = 'Searching...';
+
+      const params = new URLSearchParams();
+      if (year) params.append('year', year);
+      if (location) params.append('location', location);
+      if (caseType) params.append('case_type', caseType);
+      if (startDate) params.append('start_date', startDate);
+      if (endDate) params.append('end_date', endDate);
+
+      try {
+        const res = await fetch(`http://localhost:5000/search?${params.toString()}`);
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data = await res.json();
+        fullResults = data.cases || []; // Store full results
+
+        filteredResultsDiv.innerHTML = ''; // Clear loading
+        if (fullResults.length === 0) {
+          filteredResultsDiv.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.6);">No cases found matching your criteria.</p>';
+          resultsSummarySpan.textContent = `0 cases found.`;
+          return;
+        }
+
+        resultsSummarySpan.textContent = `${fullResults.length} cases found.`;
+
+        fullResults.forEach((caseData, index) => {
+          const caseCard = document.createElement('div');
+          caseCard.className = 'case-card';
+          const truncatedSummary = truncate(unescapeHtml(caseData.document || caseData.summary || 'No summary available.'));
+          const fullText = unescapeHtml(caseData.document || caseData.summary || 'No content available.');
+
+          caseCard.innerHTML = `
+            <h3>Case ${index + 1}: ${caseData.title || 'Untitled Case'}</h3>
+            <p class="summary" data-full="${escapeHtml(fullText)}">${truncatedSummary}</p>
+            <div class="case-meta">
+              <span>📅 Year: ${caseData.year || 'N/A'}</span>
+              <span>📍 Location: ${caseData.location || 'N/A'}</span>
+              <span>⚖️ Type: ${Array.isArray(caseData.case_type) ? caseData.case_type.join(', ') : caseData.case_type || 'N/A'}</span>
+            </div>
+            <button class="download-btn" style="margin-top:1rem;" onclick="downloadTxt(${index})">
+              ⬇️ Download Text
+            </button>
+          `;
+          filteredResultsDiv.appendChild(caseCard);
+        });
+
+      } catch (error) {
+        console.error('Error during filtered search:', error);
+        filteredResultsDiv.innerHTML = `<div class="error-message">❌ Failed to fetch data: ${error.message}<br><small>Ensure the backend server is running on localhost:5000.</small></div>`;
+        resultsSummarySpan.textContent = `Error loading results.`;
+      }
+    }
+
+    function downloadResults() {
+      if (!fullResults || fullResults.length === 0) {
+        alert("No results to download."); // Replaced alert
+        return;
+      }
+
+      const blob = new Blob([JSON.stringify(fullResults, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "supreme-court-cases.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadTxt(index) {
+      const caseData = fullResults[index];
+      const content = caseData.document || "No content available";
+      const year = caseData.year || 'unknown';
+      const filename = `case_${year}_${index + 1}.txt`;
+
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function copyResultsToClipboard() {
+      if (!fullResults || fullResults.length === 0) {
+        alert("No results to copy."); // Replaced alert
+        return;
+      }
+
+      const textToCopy = JSON.stringify(fullResults, null, 2);
+      // Using document.execCommand('copy') as navigator.clipboard.writeText() might not work in some iframe environments.
+      const textarea = document.createElement('textarea');
+      textarea.value = textToCopy;
+      textarea.style.position = 'fixed'; // Prevent scrolling to bottom
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      try {
+        const successful = document.execCommand('copy');
+        const msg = successful ? 'Results copied to clipboard!' : 'Failed to copy results.';
+        alert(msg); // Replaced alert
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+        alert('Error copying to clipboard. Please try manually.'); // Replaced alert
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function truncate(text, length = 300) {
+      if (text.length <= length) return text;
+      return text.substring(0, length) + '... <em>(click to expand)</em>';
+    }
+
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
+    function unescapeHtml(escapedText) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(escapedText, 'text/html');
+      return doc.documentElement.textContent;
+    }
+
+    // Add input animation effects
+    document.querySelectorAll('.filter-input').forEach(input => {
+      input.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'scale(1.02)';
+      });
+      
+      input.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'scale(1)';
+      });
+    });
+
+    // Initialize chart and navbar when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      loadNavbar();
+      initChart();
+    });
+
+    // Event listener for expanding/collapsing summaries
+    document.addEventListener('click', function (e) {
+      if (e.target.classList.contains('summary')) {
+        const isTruncated = e.target.innerHTML.includes('(click to expand)');
+        const full = e.target.dataset.full;
+        e.target.innerHTML = isTruncated
+          ? unescapeHtml(full) + ' <em>(click to collapse)</em>'
+          : truncate(unescapeHtml(full));
+      }
+    });
+
+  </script>
+</body>
+</html>

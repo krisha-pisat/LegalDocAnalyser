@@ -1,0 +1,37 @@
+# Python
+Lib/
+Scripts/
+Include/
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+ENV/
+env/
+build/
+dist/
+*.egg-info/
+Lib/
+Scripts/
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Project Specific
+logs/
+vectorstore/
+backup/
+*.log
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
