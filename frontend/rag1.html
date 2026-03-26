@@ -223,6 +223,28 @@
       border-bottom-left-radius: 4px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
+
+    .sources-container {
+      margin-top: 0.8rem;
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 0.5rem;
+    }
+
+    .source-item {
+      background: rgba(100, 181, 246, 0.1);
+      border-left: 3px solid #64b5f6;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      border-radius: 4px;
+    }
+
+    .source-score {
+      font-weight: bold;
+      color: #64b5f6;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
     
     .chat-input-area {
       display: flex;
@@ -411,13 +433,33 @@
       const chatInput = document.getElementById('chatInput');
       const sendBtn = document.getElementById('sendBtn');
 
-      function appendMessage(sender, text) {
+      function appendMessage(sender, text, sources = []) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message-bubble', sender);
         
         const contentDiv = document.createElement('div');
         contentDiv.classList.add('message-content');
+        
+        // Use innerHTML to handle potential formatting (optional) or just textContent
         contentDiv.textContent = text;
+
+        // If AI message and has sources, append them
+        if (sender === 'ai' && sources.length > 0) {
+          const sourcesDiv = document.createElement('div');
+          sourcesDiv.classList.add('sources-container');
+          sourcesDiv.innerHTML = '<strong>📚 Sources Used:</strong>';
+          
+          sources.forEach(src => {
+            const srcItem = document.createElement('div');
+            srcItem.classList.add('source-item');
+            srcItem.innerHTML = `
+              <span class="source-score">Relevance Score: ${(src.score * 100).toFixed(1)}%</span>
+              <div class="source-text">${src.content.substring(0, 200)}...</div>
+            `;
+            sourcesDiv.appendChild(srcItem);
+          });
+          contentDiv.appendChild(sourcesDiv);
+        }
         
         messageDiv.appendChild(contentDiv);
         chatContainer.appendChild(messageDiv);
@@ -452,7 +494,7 @@
 
           console.log("✅ Fetch completed");
           const data = await res.json();
-          appendMessage('ai', data.answer || 'No answer returned.');
+          appendMessage('ai', data.answer || 'No answer returned.', data.sources || []);
         } catch (err) {
           console.error("❌ Fetch error:", err);
           appendMessage('ai', '⚠️ Error: Could not connect to the backend.');

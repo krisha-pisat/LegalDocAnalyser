@@ -1,4 +1,5 @@
 import os
+import sys
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -8,10 +9,11 @@ from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.runnables import Runnable
 
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+sys.path.append(base_dir)
 load_dotenv(dotenv_path=os.path.join(base_dir, ".env"))
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-groq_model = ChatGroq(model="llama3-8b-8192", api_key=GROQ_API_KEY)
+groq_model = ChatGroq(model="llama-3.3-70b-versatile", api_key=GROQ_API_KEY)
 
 prompt = ChatPromptTemplate.from_messages([
     ("system", "You are a legal assistant. Answer precisely; if unknown, say so."),
@@ -21,7 +23,7 @@ prompt = ChatPromptTemplate.from_messages([
 ])
 chain: Runnable = prompt | groq_model
 
-from .rag_search import perform_vector_search
+from src.rag_1.rag_search import perform_vector_search
 
 chat_history = []
 log_dir = os.path.join(base_dir, "logs")
@@ -39,7 +41,7 @@ def log_chat(user_input: str, ai_response: str):
         f.write(f"\n👤 USER: {user_input}\n")
         f.write(f"🤖 AI  : {ai_response}\n")
 
-def rag_pipeline(query: str) -> str:
+def rag_pipeline(query: str):
     docs    = retrieve_docs(query)
     context = get_context(docs)
 
@@ -52,10 +54,10 @@ def rag_pipeline(query: str) -> str:
     ai_output = result.content
 
     chat_history.append(AIMessage(content=ai_output))
-    del chat_history[:-10]
+    chat_history[:] = chat_history[-10:]
 
     log_chat(query, ai_output)
-    return ai_output
+    return ai_output, docs
 
 if __name__ == "__main__":
     print("📜 Legal RAG Assistant\nType 'exit' to quit.\n")
@@ -65,6 +67,11 @@ if __name__ == "__main__":
             print("👋 Exiting. Take care!")
             break
         elif query:
-            print("\n🔍 Answer:")
-            print(rag_pipeline(query))
+            answer, sources = rag_pipeline(query)
+            print("\n🤖 AI ANSWER:")
+            print(answer)
+            print("\n📚 SOURCES USED:")
+            for i, d in enumerate(sources, 1):
+                score = d.metadata.get("score", 0)
+                print(f"  {i}. [Score: {score:.4f}] {d.page_content[:150]}...")
             print()

@@ -7,7 +7,7 @@ base = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 load_dotenv(dotenv_path=os.path.join(base, ".env"))
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-groq_model = ChatGroq(model="llama3-8b-8192", api_key=GROQ_API_KEY)
+llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0, api_key=GROQ_API_KEY)
 
 prompt_template = """
 Use the context provided to answer the user's question.
@@ -22,6 +22,6 @@ Answer:
 def generate_answer(query: str, docs: list) -> str:
     context = "\n\n".join(doc.page_content for doc in docs)
     prompt  = ChatPromptTemplate.from_template(prompt_template)
-    chain   = prompt | groq_model
+    chain   = prompt | llm
     result  = chain.invoke({"question": query, "context": context})
     return result.content

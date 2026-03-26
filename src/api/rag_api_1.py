@@ -25,8 +25,20 @@ def chat():
         return jsonify({"error": "Query is missing"}), 400
 
     try:
-        answer = rag_pipeline(query)
-        return jsonify({"answer": answer})
+        answer, docs = rag_pipeline(query)
+        
+        # Convert Document objects to plain dictionaries for JSON
+        sources = []
+        for d in docs:
+            sources.append({
+                "content": d.page_content,
+                "score": d.metadata.get("score", 0)
+            })
+
+        return jsonify({
+            "answer": answer,
+            "sources": sources
+        })
     except Exception as e:
         print("❌ /chat error:", e, file=sys.stderr)
         return jsonify({"error": str(e)}), 500

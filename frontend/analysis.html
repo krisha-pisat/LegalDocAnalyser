@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -93,9 +94,17 @@
     }
 
     @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
     }
 
     @keyframes float {
@@ -103,12 +112,15 @@
         transform: translateY(100vh) rotate(0deg);
         opacity: 0;
       }
+
       10% {
         opacity: 1;
       }
+
       90% {
         opacity: 1;
       }
+
       100% {
         transform: translateY(-100px) rotate(360deg);
         opacity: 0;
@@ -209,7 +221,8 @@
 
     .nav-link.active::after {
       width: 100%;
-      background: #64b5f6; /* Solid color for active */
+      background: #64b5f6;
+      /* Solid color for active */
     }
 
     .user-actions {
@@ -676,6 +689,7 @@
         opacity: 0;
         transform: translateY(-20px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -687,6 +701,7 @@
         opacity: 0;
         transform: translateY(30px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -694,43 +709,69 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
 
     @keyframes textGlow {
-      0% { text-shadow: 0 0 20px rgba(100, 181, 246, 0.5); }
-      100% { text-shadow: 0 0 30px rgba(100, 181, 246, 0.8), 0 0 40px rgba(66, 165, 245, 0.3); }
+      0% {
+        text-shadow: 0 0 20px rgba(100, 181, 246, 0.5);
+      }
+
+      100% {
+        text-shadow: 0 0 30px rgba(100, 181, 246, 0.8), 0 0 40px rgba(66, 165, 245, 0.3);
+      }
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-8px); }
-      75% { transform: translateX(8px); }
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-8px);
+      }
+
+      75% {
+        transform: translateX(8px);
+      }
     }
 
     @media (max-width: 768px) {
       .filters-grid {
         grid-template-columns: 1fr;
       }
+
       .results-header {
         flex-direction: column;
         align-items: flex-start;
       }
+
       .download-buttons {
         width: 100%;
         justify-content: space-between;
       }
+
       .download-btn {
         flex-grow: 1;
       }
     }
   </style>
 </head>
+
 <body>
   <div class="background-animation"></div>
   <div class="floating-shapes">
@@ -743,27 +784,27 @@
 
   <!-- Navigation Bar will be loaded here by JavaScript -->
   <div id="navbar-placeholder"></div>
-   <script>
-  fetch("nav.html")
-    .then(res => res.text())
-    .then(html => {
-      document.getElementById("navbar-placeholder").innerHTML = html;
+  <script>
+    fetch("nav.html")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("navbar-placeholder").innerHTML = html;
 
-      // ⏬ Re-run script blocks inside nav.html
-      const scripts = document
-        .querySelector("#navbar-placeholder")
-        .querySelectorAll("script");
+        // ⏬ Re-run script blocks inside nav.html
+        const scripts = document
+          .querySelector("#navbar-placeholder")
+          .querySelectorAll("script");
 
-      scripts.forEach(oldScript => {
-        const newScript = document.createElement("script");
-        if (oldScript.type) newScript.type = oldScript.type;
-        if (oldScript.src) newScript.src = oldScript.src;
-        else newScript.textContent = oldScript.textContent;
-        document.body.appendChild(newScript);
-        oldScript.remove();
+        scripts.forEach(oldScript => {
+          const newScript = document.createElement("script");
+          if (oldScript.type) newScript.type = oldScript.type;
+          if (oldScript.src) newScript.src = oldScript.src;
+          else newScript.textContent = oldScript.textContent;
+          document.body.appendChild(newScript);
+          oldScript.remove();
+        });
       });
-    });
-</script>
+  </script>
 
 
   <!-- Main Content -->
@@ -875,6 +916,15 @@
     // Call loadNavbar() immediately to ensure it loads before DOMContentLoaded finishes
     loadNavbar();
 
+    // Declare fullResults to avoid strict mode ReferenceError
+    let fullResults = [];
+
+    // Expose functions to global scope so inline onclick handlers can find them
+    window.runFilteredSearch = runFilteredSearch;
+    window.downloadResults = downloadResults;
+    window.copyResultsToClipboard = copyResultsToClipboard;
+    window.downloadTxt = downloadTxt;
+
     // Function to initialize and fetch chart data
     async function initChart() {
       try {
@@ -922,12 +972,12 @@
               }
             },
             title: {
-                display: true,
-                text: 'Number of Supreme Court Cases by Year',
-                color: '#ffffff',
-                font: {
-                    size: 18
-                }
+              display: true,
+              text: 'Number of Supreme Court Cases by Year',
+              color: '#ffffff',
+              font: {
+                size: 18
+              }
             }
           },
           scales: {
@@ -1102,7 +1152,7 @@
         '"': '&quot;',
         "'": '&#039;'
       };
-      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+      return text.replace(/[&<>"']/g, function (m) { return map[m]; });
     }
 
     function unescapeHtml(escapedText) {
@@ -1113,11 +1163,11 @@
 
     // Add input animation effects
     document.querySelectorAll('.filter-input').forEach(input => {
-      input.addEventListener('focus', function() {
+      input.addEventListener('focus', function () {
         this.parentElement.style.transform = 'scale(1.02)';
       });
-      
-      input.addEventListener('blur', function() {
+
+      input.addEventListener('blur', function () {
         this.parentElement.style.transform = 'scale(1)';
       });
     });
@@ -1141,4 +1191,5 @@
 
   </script>
 </body>
+
 </html>
