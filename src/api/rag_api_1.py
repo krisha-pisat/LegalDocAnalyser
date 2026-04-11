@@ -21,11 +21,13 @@ CORS(app)
 def chat():
     payload = request.get_json() or {}
     query   = payload.get("query", "").strip()
+    case_id = payload.get("case_id", None)
+    
     if not query:
         return jsonify({"error": "Query is missing"}), 400
 
     try:
-        answer, docs = rag_pipeline(query)
+        answer, docs = rag_pipeline(query, case_id)
         
         # Convert Document objects to plain dictionaries for JSON
         sources = []

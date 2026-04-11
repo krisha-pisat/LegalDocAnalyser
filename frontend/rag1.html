@@ -433,6 +433,14 @@
       const chatInput = document.getElementById('chatInput');
       const sendBtn = document.getElementById('sendBtn');
 
+      // Extract specific Case ID from URL exactly as architected
+      const urlParams = new URLSearchParams(window.location.search);
+      const targetCaseId = urlParams.get('case_id');
+
+      if (targetCaseId) {
+        document.querySelector('.chat-subtitle').innerHTML = `<span style="color: #64b5f6; font-weight: bold;">[Context Locked]</span> Analyzing specific Document ID: <span style="font-family: monospace; opacity: 0.8;">${targetCaseId}</span>`;
+      }
+
       function appendMessage(sender, text, sources = []) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message-bubble', sender);
@@ -486,10 +494,16 @@
         showLoading(true);
 
         try {
+          const requestPayload = { query: userMessage };
+          // If the user arrived via "Chat with Case" button, lock the backend to this ID
+          if (targetCaseId) {
+             requestPayload.case_id = targetCaseId;
+          }
+
           const res = await fetch('http://localhost:8000/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: userMessage })
+            body: JSON.stringify(requestPayload)
           });
 
           console.log("✅ Fetch completed");

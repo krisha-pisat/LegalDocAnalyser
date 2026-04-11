@@ -446,28 +446,131 @@
       min-height: 200px;
     }
 
-    .result-item {
+    .results {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .result-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 2rem;
       margin-bottom: 1.5rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+      animation: slideInCard 0.6s ease-out forwards;
     }
 
-    .result-item:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
+    .result-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, #42a5f5, #1976d2);
+      border-radius: 0 2px 2px 0;
     }
 
-    .result-item h3 {
-      font-size: 1.5rem;
+    .result-card:hover {
+      transform: translateY(-6px);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+    }
+
+    .result-title {
+      font-size: 1.2rem;
+      font-weight: 700;
       color: #64b5f6;
-      margin-bottom: 0.8rem;
+      margin-bottom: 1rem;
     }
 
-    .result-item p {
-      font-size: 0.95rem;
-      line-height: 1.6;
-      color: rgba(255, 255, 255, 0.8);
+    .result-content {
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      font-size: 1rem;
+    }
+
+    .result-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .score {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.6rem 1.2rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .download-btn {
+      padding: 0.8rem 1.5rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      background: rgba(76, 175, 80, 0.2);
+      color: #81c784;
+      border: 1px solid rgba(76, 175, 80, 0.3);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .download-btn:hover {
+      background: rgba(76, 175, 80, 0.3);
+      border-color: rgba(76, 175, 80, 0.5);
+      transform: translateY(-2px);
+    }
+
+    @keyframes slideInCard {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .score-bar {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      height: 10px;
+      margin-bottom: 0.5rem;
+      overflow: hidden;
+    }
+
+    .score-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50, #81c784);
+      transition: width 0.3s ease;
+    }
+
+    .score-label {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    .tag {
+      display: inline-block;
+      background: rgba(100, 181, 246, 0.15);
+      color: #64b5f6;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      border-radius: 12px;
+      margin-right: 0.4rem;
+      margin-bottom: 0.4rem;
+      border: 1px solid rgba(100, 181, 246, 0.3);
     }
 
     .summary {
@@ -765,43 +868,66 @@
       resultsDiv.innerHTML = ''; // Clear existing results
 
       try {
-        // Simulate an API call
-        const response = await new Promise(resolve => setTimeout(() => {
-          const mockResults = [
-            {
-              title: "Landmark Case: Kesavananda Bharati v. State of Kerala",
-              summary: "This case laid down the 'Basic Structure Doctrine' of the Indian Constitution, stating that certain fundamental features of the Constitution cannot be amended by the Parliament. This doctrine has been a cornerstone of Indian constitutional law, limiting the Parliament's power to amend the Constitution and upholding its democratic and secular character. It established judicial review as a key feature for protecting the spirit of the Constitution.",
-              link: "#"
-            },
-            {
-              title: "Right to Privacy: K.S. Puttaswamy v. Union of India",
-              summary: "The Supreme Court of India unanimously affirmed that the right to privacy is a fundamental right under the Indian Constitution. This judgment had significant implications for data protection, surveillance, and personal liberties in the digital age. It recognized privacy as an intrinsic part of life and personal liberty under Article 21.",
-              link: "#"
-            },
-            {
-              title: "Aadhar Verdict: Challenging the Constitutionality of Aadhar Act",
-              summary: "The Supreme Court upheld the constitutional validity of the Aadhar Act, but with certain caveats. It struck down some provisions that allowed private entities to use Aadhar data. The judgment emphasized that Aadhar is meant for welfare schemes and not for general surveillance. It balanced the state's interest in welfare distribution with individual privacy rights.",
-              link: "#"
-            }
-          ];
-          resolve({ status: 200, json: () => Promise.resolve({ results: mockResults }) });
-        }, 1500)); // Simulate network delay
-
+        // Live API call to the Flask Backend Search Endpoint
+        const response = await fetch(`http://localhost:5000/search?query=${encodeURIComponent(searchText)}`);
         const data = await response.json();
 
-        if (data.results && data.results.length > 0) {
-          data.results.forEach(item => {
-            const resultItem = document.createElement('div');
-            resultItem.className = 'result-item';
-            const fullSummary = item.summary;
-            const displayedSummary = truncate(fullSummary, 150); // Adjust length as needed
+        // The backend returns an array under 'cases'
+        const foundCases = data.cases || [];
 
-            resultItem.innerHTML = `
-              <h3>${item.title}</h3>
-              <p class="summary" data-full="${escapeHtml(fullSummary)}">${displayedSummary}</p>
-              ${item.link ? `<p><a href="${item.link}" target="_blank" style="color: #64b5f6; text-decoration: none;">Read More</a></p>` : ''}
+        if (foundCases.length > 0) {
+          const headerElement = document.createElement('div');
+          headerElement.style = "font-size: 1.2rem; margin-bottom: 1.5rem; color: #64b5f6; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;";
+          headerElement.innerHTML = `🔍 ${foundCases.length} related cases found`;
+          resultsDiv.appendChild(headerElement);
+
+          foundCases.slice(0, 15).forEach((item, index) => { // Limit to top 15 results to avoid lag
+            const card = document.createElement('div');
+            card.className = 'result-card';
+            card.style.animationDelay = `${index * 0.15}s`;
+            
+            // Safely grab the summary or text
+            const fullSummary = item.summary || item.document || "No description available for this case.";
+            const displayedSummary = truncate(fullSummary, 250); 
+            
+            const relevanceScore = item.score ? (item.score * 100).toFixed(2) : 0;
+            
+            const caseTags = Array.isArray(item.case_type) && item.case_type.length
+              ? item.case_type.map(type => `<span class="tag">${type}</span>`).join(' ')
+              : `<span class="tag">${item.case_type || 'Unknown'}</span>`;
+
+            const caseTitle = item.title && item.title !== "Untitled Case" ? item.title : `Case ${index + 1}`;
+
+            card.innerHTML = `
+              <div class="result-title">
+                📋 ${caseTitle}
+                <span style="font-size: 0.85rem; color: #aaa;">(${item.year || 'Year N/A'} | ${item.location || 'Unknown'})</span>
+              </div>
+              <div style="font-family: monospace; font-size: 0.8rem; color: #888; margin-top: -0.2rem; margin-bottom: 0.5rem;">
+                [Database ID: ${item._id}]
+              </div>
+              <div class="tag-container" style="margin: 0.5rem 0 1rem;">${caseTags}</div>
+              
+              <div style="background: rgba(100, 181, 246, 0.1); border-left: 3px solid #64b5f6; padding: 1rem; margin-bottom: 1rem; border-radius: 4px; font-size: 0.95rem;">
+                <span style="color: #64b5f6; font-weight: bold;">💡 AI Exact Match Snippet:</span><br>
+                <i>"...${highlightKeyword(item.chunk_snippet || 'No snippet loaded', searchText)}..."</i>
+              </div>
+
+              <div style="margin-bottom: 0.5rem; font-weight: bold; color: #fff;">Full Case Summary:</div>
+              <div class="result-content summary" data-full="${escapeHtml(fullSummary)}">${displayedSummary}</div>
+              <div class="result-footer">
+                <div style="flex: 1; max-width: 200px;">
+                    <div class="score-bar">
+                      <div class="score-fill" style="width: ${relevanceScore}%"></div>
+                    </div>
+                    <div class="score-label">Relevance: ${relevanceScore}%</div>
+                </div>
+                <button class="download-btn" onclick="window.location.href='rag1.html?case_id=${item._id}'">
+                  💬 Chat with this Case
+                </button>
+              </div>
             `;
-            resultsDiv.appendChild(resultItem);
+            resultsDiv.appendChild(card);
           });
         } else {
           resultsDiv.innerHTML = '<div class="initial-message"><p>No results found for your query.</p></div>';
@@ -823,6 +949,14 @@
         "'": '&#039;'
       };
       return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
+    function highlightKeyword(text, keyword) {
+      if (!keyword || !text) return escapeHtml(text || '');
+      const escapedText = escapeHtml(text);
+      // Escape the keyword for safe RegEx matching, then replace case-insensitively
+      const regex = new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      return escapedText.replace(regex, '<span style="background-color: yellow; color: black; font-weight: bold; padding: 0 4px; border-radius: 3px;">$1</span>');
     }
   </script>
 </body>
